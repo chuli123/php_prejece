@@ -1,0 +1,13 @@
+html,body,div,span,h1,h2,h3,h4,p,em,img,dl,dt,dd,ol,ul,li,table,tr,th,td,form{margin:0;padding:0;border:0;}
+html body{font:14px/1.5 '微软雅黑','宋体', arial, tahoma, simsun;color:#666;background:#fff;height:100%;}
+.new_bod_bg{background-color:#eee;}
+html{height:100%;}
+ul,ol,li{list-style:none;text-align:left;}
+img{vertical-align:top;border:0 none;}
+input,label{vertical-align:middle;}
+table{border-collapse:collapse;border-spacing:0;}
+a{outline-style:none;text-decoration:none;color:#019fe9;}
+a:hover{color:#019fe9;}
+p,div{word-wrap:break-word;}
+
+.wrap{width: 1200px;margin: 0 auto;}
