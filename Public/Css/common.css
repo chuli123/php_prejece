@@ -11,3 +11,6 @@ a:hover{color:#019fe9;}
 p,div{word-wrap:break-word;}
 
 .wrap{width: 1200px;margin: 0 auto;}
+
+/*注册*/
+.error{color: red;display: block;margin-top: 5px;}

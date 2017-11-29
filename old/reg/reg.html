@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+    <script type="text/javascript" src="../Public/Js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../Public/Js/angular/angular.min.js"></script>
+    <script type="text/javascript" src="../Public/Js/check.js"></script>
+    <link rel="stylesheet" media="screen" type="text/css" href="../Public/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../Public/Css/common.css">
+
+    <link href="../Public/bootstrap/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+    <script type="text/javascript" src="../Public/bootstrap/js/bootstrap.min.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="../Public/bootstrap/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="../Public/bootstrap/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+</head>
+<body>
+    <div class="wrap" ng-app="myApp" ng-controller="myCtrl">
+        <div class="panel panel-default">
+            <div class="panel-heading">用户注册</div>
+            <div class="panel-body">
+                <form class="form-horizontal" name="myForm" ng-submit="processForm()">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">注册名称：</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="name" ng-model="formData.name" placeholder="请输入注册名称" ng-blur="checkName(formData.name)" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <span class="error">{{message}}</span>
+                            <span class="error" ng-show="myForm.name.$dirty && myForm.name.$invalid">
+                                <span ng-show="myForm.name.$error.required">用户名是必须的。</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">注册密码：</label>
+                        <div class="col-sm-4">
+                            <input type="password" class="form-control" name="password" ng-model="formData.password" id="password" placeholder="请输入注册密码" ng-minlength="6" ng-maxlength="20" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <span class="error" ng-show="myForm.password.$dirty && myForm.password.$invalid">
+                                <span ng-show="myForm.password.$error.required">注册密码是必须的。</span>
+                                <span ng-show="myForm.password.$error.minlength">*密码长度不小于6</span>
+                                <span ng-show="myForm.password.$error.maxlength">*密码长度不超过20</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">确认密码：</label>
+                        <div class="col-sm-4">
+                            <input type="password" class="form-control" name="password1" ng-model="password1" placeholder="请再次输入密码" pw-check="password" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <span class="error" ng-show="myForm.password1.$dirty && myForm.password1.$invalid">
+                                <span ng-show="myForm.password1.$error.required">确认密码是必须的。</span>
+                                <span ng-show="myForm.password1.$error.pwmatch">两次密码不一样。</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">电子邮箱：</label>
+                        <div class="col-sm-4">
+                            <input type="email" class="form-control" name="email" ng-model="formData.email" placeholder="请输入电子邮箱" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <span class="error" ng-show="myForm.email.$dirty && myForm.email.$invalid">
+                                <span ng-show="myForm.email.$error.required">电子邮箱是必须的。</span>
+                                <span ng-show="myForm.email.$error.email">非法的邮箱地址。</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">密保问题：</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="question" ng-model="formData.question"  placeholder="请输入密保问题">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">密保答案：</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="answer" ng-model="formData.answer" placeholder="请输入密保答案">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label  class="col-sm-2 control-label">真实姓名：</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="realname" ng-model="formData.realname"  placeholder="请输入真是姓名">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">出生日期：</label>
+                        <div class="col-sm-4 date form_date input-group" data-date="" data-date-format="yyyy-mm-dd" data-link-field="dtp_input2" data-link-format="yyyy-mm-dd" style="padding-left: 15px;">
+                            <input class="form-control"  type="text" name="birthday" ng-model="formData.birthday" value="" placeholder="请选择日期">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">联系电话：</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="telephone" ng-model="formData.telephone" placeholder="请输入联系电话">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">QQ号码：</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="qq" ng-model="formData.qq"  placeholder="请输入QQ号码">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-default">注&nbsp;&nbsp;册</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $('.form_date').datetimepicker({
+            language:  'zh-CN',
+            weekStart: 1,
+            todayBtn:  1,
+            format: 'yyyy-mm-dd',
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            minView: 2,
+            forceParse: 0
+        });
+    </script>
+</body>
+</html>

@@ -1,118 +1,122 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Administrator
- * Date: 2017/7/11
- * Time: 17:10
+ * Mysql类
  */
-
 class Db{
-    private $db_host = '';  //服务器地址
-    private $db_user = ''; //用户名
-    private $db_pwd = ''; //密码
-    private $db_name = ''; //数据库名
-    private $conn = ''; //数据库连接资源
-    private $result = ''; //结果集
-    private $msg = ''; //返回结果
-    private $fields = ''; //返回字段
-    private $fieldsNum = 0; //返回字段数
-    private $rowsNum = 0; //返回结果数
-    private $rowsRst = ''; //返回单条记录的字段数组
-    private $fieldArray = array(); //返回字段数组
-    private $rowsArray = array(); //返回结果数组
 
-    public function __construct($db_host,$db_user,$db_pwd,$db_name){
-        if($db_host!=''){
-            $this->db_host = $db_host;
-        }
-        if($db_user!=''){
-            $this->db_user = $db_user;
-        }
-        if($db_pwd!=''){
-            $this->db_pwd = $db_pwd;
-        }
-        if($db_name!=''){
-            $this->db_name = $db_name;
-        }
-        $this->init_conn();
+    private static $link = null;//数据库连接
+    private static $db_host = 'localhost'; //服务器地址
+    private static $db_user = 'root'; //用户名
+    private static $db_pwd = ''; //密码
+    private static $db_name = 'module'; //数据库名
+
+    /**
+     * 构造方法
+     */
+    public function __construct(){
+
     }
 
-//  连接数据库
-    public function init_conn(){
-        $this->conn = new mysqli($this->host,$this->db_user,$this->db_pwd);
-        $this->conn->select_db($this->db_name);
-        mysqli_query("SET NAMES UTF8");
-    }
-
-    public function mysql_query_rst($sql){
-        if($this->conn==''){
-            $this->init_conn();
+    /**
+     * 连接数据库
+     * @return obj 资源对象
+     */
+    private static function conn(){
+        if(self::$link === null){
+            self::$link = new Mysqli(self::$db_host,self::$db_user,self::$db_pwd,self::$db_name);
+            self::query("set names UTF8");//设置字符集
         }
-        $this->result = mysqli_query($this->conn,$sql);
+        return self::$link;
     }
 
-//    获取记录中的行数
-    public function getRowsNum($sql){
-        $this->mysql_query_rst($sql);
-        if(mysqli_errno()==0){
-            return mysqli_num_rows($this->result);
+    /**
+     * 执行一条sql语句
+     * @param  str $sql 查询语句
+     * @return obj      结果集对象
+     */
+    public static function query($sql){
+        return self::conn()->query($sql);
+    }
+
+    /**
+     * 获取多行数据
+     * @param  str $sql 查询语句
+     * @return arr      多行数据
+     */
+    public static function getAll($sql){
+        $data = array();
+        $res = self::query($sql);
+        while($row = $res->fetch_assoc()){
+            $data[] = $row;
+        }
+        return $data;
+    }
+
+    /**
+     * 获取一行数据
+     * @param  str $row 查询语句
+     * @return arr      单行数据
+     */
+    public static function getRow($sql){
+        $res = self::query($sql);
+        return $res->fetch_assoc();
+    }
+
+    /**
+     * 获取单个结果
+     * @param  str $sql 查询语句
+     * @return str      单个结果
+     */
+    public static function getOne($sql){
+        $res = self::query($sql);
+        $data = $res->fetch_row();
+        return $data[0];
+    }
+
+    /**
+     * 插入/更新数据
+     * @param  str $table  表名
+     * @param  arr $data  插入/更新的数据
+     * @param  str $act   insert/update
+     * @param  str $where 更新条件
+     * @return bool 插入/更新是否成功
+     */
+    public static function exec($sql){
+        $result = self::conn()->query($sql) or die("数据操作失败".self::conn()->error);
+        if(!$result){
+            return 0;
         }else{
-            return '';
-        }
-    }
-
-//    获取单条记录
-    public function getRowsRst($sql){
-        $this->mysql_query_rst($sql);
-        if(mysqli_errno()==0){
-            $this->rowsRst = mysqli_fetch_array($this->result,MYSQLI_ASSOC);
-            return $this->rowsRst;
-        }else{
-            return '';
-        }
-    }
-
-
-//    获取多条记录
-    public function getRowsArray($sql){
-        $this->mysql_query_rst($sql);
-        if(mysqli_errno()==0){
-            while($rows = mysqli_fetch_array($this->result,MYSQLI_ASSOC)){
-                $this->rowsArray[] = $rows;
+            if(self::conn()->affected_rows > 0){
+                return 1;
+            }else{
+                return 2;
             }
-            return $this->rowsArray;
-        }else{
-            return '';
         }
+        self::close;
     }
 
-//    数据库更新，修改，删除
-    public function uidRst($sql){
-        $this->mysql_query_rst($sql);
-        $this->rowsNum = mysqli_affected_rows($this->conn);
-        if(mysqli_errno()==0){
-            return $this->rowsNum;
-        }else{
-            return '';
-        }
+    /**
+     * 获取最近一次插入的主键值
+     * @return int 主键
+     */
+    public static function getLastId(){
+        return self::conn()->insert_id;
     }
 
-//    释放结果集函数，将不再使用的数据删除，释放内存
-    public function close_rst(){
-        mysqli_free_result($this->result);
-        $this->msg = '';
-        $this->fieldsNum = 0;
-        $this->rowsNum = 0;
-        $this->fieldArray = '';
-        $this->rowsArray = '';
+    /**
+     * 获取最近一次操作影响的行数
+     * @return int 影响的行数
+     */
+    public static function getAffectedRows(){
+        return self::conn()->affected_rows;
     }
 
-//    关闭数据库连接
-    public function close_conn(){
-        $this->close_rst();
-        mysqli_close($this->conn);
-        $this->conn = '';
+    /**
+     * 关闭数据库连接
+     * @return bool 是否关闭
+     */
+    public static function close(){
+        return self::conn()->close();
     }
+
 }
-$connect = new Db();
-?>

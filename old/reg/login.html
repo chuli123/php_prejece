@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <link rel="stylesheet" media="screen" type="text/css" href="../Public/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="../Public/Css/common.css">
+    <script type="text/javascript" src="../Public/Js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../Public/Js/angular/angular.min.js"></script>
+    <script type="text/javascript" src="../Public/Js/angular/angular-route.js"></script>
+    <script type="text/javascript" src="../Public/Js/checkLogin.js"></script>
+    <script type="text/javascript" src="../Public/bootstrap/js/bootstrap.min.js" charset="UTF-8"></script>
+</head>
+<body>
+    <div class="wrap" ng-app="myLogin" ng-controller="myLogin">
+        <div class="panel panel-default">
+            <div class="panel-heading">登录</div>
+            <div class="panel-body">
+                <form class="form-horizontal" name="myForm" ng-submit="loginForm()">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">用户名：</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" name="name" ng-model="formData.name" placeholder="请输入注册名称" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <span class="error" ng-show="myForm.name.$dirty && myForm.name.$invalid">
+                                <span ng-show="myForm.name.$error.required">用户名是必须的。</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">密码：</label>
+                        <div class="col-sm-4">
+                            <input type="password" class="form-control" name="password" ng-model="formData.password" placeholder="请输入登录密码" required>
+                        </div>
+                        <div class="col-sm-2">
+                            <span class="error" ng-show="myForm.password.$dirty && myForm.password.$invalid">
+                                <span ng-show="myForm.password.$error.required">用户名是必须的。</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-default">登&nbsp;&nbsp;录</button>
+                            <button type="submit" class="btn btn-default">找回密码</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

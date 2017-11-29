@@ -1,0 +1,14 @@
+.logo{
+    height: 90px;
+    line-height: 90px;
+    margin-left: 2%;
+    font-size: 3rem;
+}
+.menu{
+    width:20%;
+    float: left;
+}
+.content{
+    width:79%;
+    float: right;
+}

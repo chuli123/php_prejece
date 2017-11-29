@@ -1,0 +1,155 @@
+<?php 
+header("Content-type: text/html; charset=utf-8");
+include_once("./config.php");
+// 初始显示界面数据获取
+$data = file_get_contents(URL."/interfaces/page.php?paging=1");
+// echo $data;die;
+$data = json_decode($data);
+// var_dump($data);die;
+ ?>
+
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui" charset="UTF-8">
+    <title>加载顶部、底部</title>
+    <!-- 页面布局 -->
+    <link rel="stylesheet" type="text/css" href="./css/display.css">
+    <!-- 框架布局 -->
+    <link rel="stylesheet" href="./css/dropload.css">
+</head>
+
+<body>
+<div class="header">
+    <h1>就当我是新闻页吧</h1>
+</div>
+<div class="content">
+    <div class="lists">
+    <!-- lists在外 避免造成多次循环输出 -->
+    <?php for ($i=0; $i < count($data->data) ; $i++) { ?>
+        <a class="item" href="#">
+            <img src="./img/pic.jpg" alt="">
+            <h3>hehe</h3>
+            <span class="date"><?php echo $data->data[$i]->id; ?></span>
+        </a>
+    <?php } ?>
+    </div>
+</div>
+<div class="footer">
+    <a href="#1" class="item">测试菜单</a>
+    <a href="#2" class="item">只做展示</a>
+    <a href="#3" class="item">无功能</a>
+    <a href="#4" class="item">不用点</a>
+</div>
+<!-- jQuery1.7以上 或者 Zepto 二选一，不要同时都引用 -->
+<script src="./js/jquery.min.js"></script>
+<script src="./js/dropload.min.js"></script>
+<script>
+$(function(){
+    var paging = 1;//页码数
+    // dropload函数接口设置
+    $('.content').dropload({
+        scrollArea : window,
+        // 下拉刷新模块显示内容
+        domUp : {
+            domClass   : 'dropload-up',
+            // 下拉过程显示内容
+            domRefresh : '<div class="dropload-refresh">↓下拉过程显示内容-下拉刷新-自定义内容</div>',
+            // 下拉到一定程度显示提示内容
+            domUpdate  : '<div class="dropload-update">↑释放更新-自定义内容</div>',
+            // 释放后显示内容
+            domLoad    : '<div class="dropload-load"><span class="loading"></span>加载中-自定义内容...</div>'
+        },
+        domDown : {
+            domClass   : 'dropload-down',
+            // 滑动到底部显示内容
+            domRefresh : '<div class="dropload-refresh">↑上拉加载更多-自定义内容</div>',
+            // 内容加载过程中显示内容
+            domLoad    : '<div class="dropload-load"><span class="loading"></span>加载中-自定义内容...</div>',
+            // 没有更多内容-显示提示
+            domNoData  : '<div class="dropload-noData">暂无数据-自定义内容</div>'
+        },
+        // 1 . 下拉刷新 回调函数
+        loadUpFn : function(me){
+            $.ajax({
+                type: 'GET',
+                // 每次获取最新的数据即可
+                url: './interfaces/page.php?paging=1',
+                dataType: 'json',
+                success: function(data){
+                    // $.ajax()虽然接口提供json字符串，但接收到的是 json对象
+                    // alert(typeof(data));
+                    var result = '';
+                    // 循环拼接显示内容 DOM
+                    // 刷新获取多少数据，显示多少 使用html()重置 lists DOM
+                    for(var i = 0; i < data.data.length; i++){
+                        result +=   '<a class="item opacity" href="'+data.data[i].link+'">'
+                                        +'<img src="'+data.data[i].pic+'" alt="">'
+                                        +'<h3>hehe</h3>'
+                                        +'<span class="date">'+data.data[i].id+'</span>'
+                                    +'</a>';
+                    }
+                    // 为了测试，延迟1秒加载
+                    setTimeout(function(){
+                        // 插入加载使用 html() 重置 DOM
+                        $('.lists').html(result);
+                        // 每次数据加载完，必须重置
+                        me.resetload();
+                    },1000);
+                },
+                // 加载出错
+                error: function(xhr, type){
+                    alert('Ajax error!');
+                    // 即使加载出错，也得重置
+                    me.resetload();
+                }
+            });
+        },
+        // 2 . 上拉加载更多 回调函数
+        loadDownFn : function(me){
+            paging++; // 每次请求，页码加1
+            $.ajax({
+                type: 'GET',
+                url: './interfaces/page.php?paging='+paging,
+                dataType: 'json',
+                success: function(data){
+                    // data = JSON.parse(data);
+                    var result = '';
+                    // 选择需要显示的数据 拼接 DOM
+                    for(var i = 0; i < data.data.length; i++){
+                        result +=   '<a class="item opacity" href="'+data.data[i].link+'">'
+                                        +'<img src="'+data.data[i].pic+'" alt="">'
+                                        +'<h3>heheh</h3>'
+                                        +'<span class="date">'+data.data[i].id+'</span>'
+                                    +'</a>';
+                        if(data.data.length<15){
+                            // 再往下已经没有数据
+                            // 锁定
+                            me.lock();
+                            // 显示无数据
+                            me.noData();
+                            break;
+                        }
+                    }
+                    // 为了测试，延迟1秒加载
+                    setTimeout(function(){
+                        // 加载 插入到原有 DOM 之后
+                        $('.lists').append(result);
+                        // 每次数据加载完，必须重置
+                        me.resetload();
+                    },1000);
+                },
+                // 加载出错
+                error: function(xhr, type){
+                    alert('Ajax error!');
+                    // 即使加载出错，也得重置
+                    me.resetload();
+                }
+            });
+        },
+        threshold : 50 // 什么作用???
+    });
+});
+</script>
+</body>
+</html>

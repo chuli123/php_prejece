@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>留言板</title>
+    <link rel="stylesheet" href="../Public/bootstrap/css/bootstrap.css" type="text/css">
+    <script src="../Public/Js/jquery-1.9.1.min.js" type="text/javascript" charset="UTF-8"></script>
+    <script src="../Public/Js/angular/angular.min.js" type="text/javascript" charset="UTF-8"></script>
+    <script src="../Public/Js/angular/angular-ui-router.js" type="text/javascript" charset="UTF-8"></script>
+    <script src="../Public/Js/angular/angular-resource.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body ng-app="app">
+    <ui-view></ui-view>
+<script>
+    var app = angular.module('app',['ui.router']);
+    app.config(['$stateProvider','$urlRouterProvider',function($stateProvider,$urlRouterProvider){
+        $urlRouterProvider.otherwise('/list');
+        $stateProvider.state('list',{
+            url:'/list',
+            templateUrl:'list.html',
+            controller:'ctrl'
+        })
+        .state('add',{
+            params:{"data":null},
+            url:'/add',
+            templateUrl:'add.html',
+            controller:'add'
+        })
+    }]);
+    app.controller('add',['$scope','$http','$state','$stateParams',function($scope,$http,$state,$stateParams){
+        $scope.message = $stateParams.data;
+        $scope.submitForm = function(){
+            $http({
+                method:"post",
+                url:'add.php',
+                data: $.param($scope.message),
+                headers:{'Content-type':'application/x-www-form-urlencoded'}
+            }).then(function(respond){
+                if(respond.data.status == 1){
+                    alert("添加成功");
+                    $state.go('list');
+                }
+            });
+        }
+    }]);
+    app.controller('ctrl',['$scope','$http','$state','$stateParams',function($scope,$http,$state,$stateParams){
+        $http.get('list.php').then(function(respond){
+            $scope.list = respond.data;
+        });
+        $scope.edit = function(id){
+            $http({
+                method:'post',
+                url:'list_1.php',
+                data: $.param({'id':id}),
+                headers:{'Content-type':'application/x-www-form-urlencoded'}
+            }).then(function(respond){
+                if(respond.data.status==1){
+                    $scope.message = respond.data;
+                    console.log($scope.message);
+                    $state.go('add',{data: $scope.message});
+                }
+            });
+        };
+        $scope.delete = function(id){
+            $http({
+                method:'post',
+                url:'del.php',
+                data: $.param({'id':id}),
+                headers:{'Content-type':'application/x-www-form-urlencoded'}
+            }).then(function(respond){
+                if(respond.data.status == 1){
+                    alert("删除成功");
+                    $http.get('list.php').then(function(respond){
+                        $scope.list = respond.data;
+                    });
+                    $state.go('list');
+                }
+            });
+        }
+    }]);
+</script>
+</body>
+</html>

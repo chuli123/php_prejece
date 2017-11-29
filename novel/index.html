@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>小说</title>
+    <link rel="stylesheet" href="../Public/bootstrap/css/bootstrap.css" type="text/css">
+    <link rel="stylesheet" href="../Public/Css/novel.css">
+    <script src="../Public/Js/jquery-1.9.1.min.js" type="text/javascript" charset="UTF-8"></script>
+    <script src="../Public/Js/angular/angular.min.js" type="text/javascript" charset="UTF-8"></script>
+    <script src="../Public/Js/angular/angular-ui-router.js" type="text/javascript" charset="UTF-8"></script>
+</head>
+<body ng-app="app">
+    <div ui-view="top"></div>
+    <div ui-view="left"></div>
+    <div ui-view="right"></div>
+<script>
+    var app = angular.module('app',['ui.router']);
+    app.config(['$urlRouterProvider','$stateProvider',function($urlRouterProvider,$stateProvider){
+        $urlRouterProvider.otherwise('/home');
+        $stateProvider.state('home',{
+            url:'/home',
+            views:{
+                top:{
+                    templateUrl:'view/top.html'
+                },
+                left:{
+                    templateUrl:'view/left.html'
+                },
+                right:{
+                    templateUrl:'view/right.html'
+                }
+            }
+        })
+        .state('pass',{
+            url:''
+        })
+    }]);
+    app.controller('ctrl',['$scope',function($scope){
+
+    }]);
+</script>
+</body>
+</html>
